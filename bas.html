@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SecureAuth Enterprise - Behavioral Authentication Platform</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* (your original CSS - unchanged) */
+    :root{--primary-gradient:linear-gradient(135deg,#667eea 0%,#764ba2 100%);--secondary-gradient:linear-gradient(135deg,#f093fb 0%,#f5576c 100%);--dark-gradient:linear-gradient(135deg,#2d3748 0%,#1a202c 100%);--glass-bg:rgba(255,255,255,0.03);--glass-border:rgba(255,255,255,0.1);--text-primary:#1a202c;--text-secondary:#4a5568;--text-muted:#718096;--surface:#ffffff;--surface-elevated:rgba(255,255,255,0.95);--accent-blue:#667eea;--accent-purple:#764ba2;--success:#48bb78;--warning:#ed8936;--error:#f56565}*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--primary-gradient);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;overflow-x:hidden;position:relative}body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:radial-gradient(circle at 20% 50%,rgba(120,119,198,0.3) 0%,transparent 50%),radial-gradient(circle at 80% 20%,rgba(255,119,198,0.3) 0%,transparent 50%),radial-gradient(circle at 40% 80%,rgba(120,119,198,0.2) 0%,transparent 50%);pointer-events:none;z-index:-1}.brand-header{position:absolute;top:32px;left:32px;display:flex;align-items:center;gap:12px;z-index:100}.brand-logo{width:48px;height:48px;background:var(--primary-gradient);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:white;box-shadow:0 8px 32px rgba(0,0,0,0.12)}.brand-info h1{color:white;font-size:24px;font-weight:700;letter-spacing:-0.025em}.brand-info p{color:rgba(255,255,255,0.8);font-size:14px;font-weight:500}.enrollment-container{background:var(--surface-elevated);backdrop-filter:blur(40px) saturate(180%);border:1px solid var(--glass-border);border-radius:24px;padding:48px;box-shadow:0 32px 64px rgba(0,0,0,0.12),0 0 0 1px rgba(255,255,255,0.05) inset;max-width:1000px;width:100%;max-height:90vh;overflow-y:auto;position:relative}.enrollment-container::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.4),transparent)}.header{text-align:center;margin-bottom:40px}.header-title{font-size:32px;font-weight:700;background:var(--primary-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px;letter-spacing:-0.025em}.header-subtitle{color:var(--text-secondary);font-size:18px;font-weight:500;margin-bottom:32px}.progress-container{margin-bottom:40px}.progress-steps{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;position:relative}.progress-steps::before{content:'';position:absolute;top:50%;left:0;right:0;height:2px;background:#e2e8f0;z-index:1;transform:translateY(-50%)}.progress-line{position:absolute;top:50%;left:0;height:2px;background:var(--primary-gradient);z-index:2;transform:translateY(-50%);transition:width .6s cubic-bezier(.4,0,.2,1);width:0%}.progress-step{width:48px;height:48px;border-radius:50%;background:#e2e8f0;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:16px;color:var(--text-muted);z-index:3;position:relative;transition:all .3s ease}.progress-step.active{background:var(--primary-gradient);color:white;box-shadow:0 8px 32px rgba(102,126,234,.3);transform:scale(1.05)}.progress-step.completed{background:var(--success);color:white}.progress-step.completed::after{content:'✓';position:absolute}.step-labels{display:flex;justify-content:space-between;margin-top:12px}.step-label{font-size:12px;font-weight:500;color:var(--text-muted);text-align:center;flex:1}.step-label.active{color:var(--accent-blue);font-weight:600}.step{display:none;animation:fadeSlideIn .6s cubic-bezier(.4,0,.2,1)}.step.active{display:block}@keyframes fadeSlideIn{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}.step-header{margin-bottom:32px}.step-title{font-size:28px;font-weight:700;color:var(--text-primary);margin-bottom:8px;letter-spacing:-0.025em}.step-description{font-size:16px;color:var(--text-secondary);line-height:1.6}.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;margin-bottom:32px}.form-group{margin-bottom:24px}.form-label{display:block;margin-bottom:8px;font-weight:600;color:var(--text-primary);font-size:14px;letter-spacing:.025em;text-transform:uppercase}.form-input,.form-textarea{width:100%;padding:16px 20px;border:2px solid #e2e8f0;border-radius:12px;font-size:16px;font-weight:500;background:rgba(255,255,255,0.8);backdrop-filter:blur(8px);transition:all .3s cubic-bezier(.4,0,.2,1);font-family:inherit}.form-input:focus,.form-textarea:focus{outline:none;border-color:var(--accent-blue);background:rgba(255,255,255,0.95);box-shadow:0 0 0 4px rgba(102,126,234,.1),0 8px 32px rgba(0,0,0,.06);transform:translateY(-1px)}.form-input::placeholder,.form-textarea::placeholder{color:var(--text-muted);font-weight:400}.form-help{margin-top:6px;font-size:13px;color:var(--text-muted);font-weight:500}.password-strength{margin-top:12px;padding:12px 16px;border-radius:8px;font-size:14px;font-weight:600;transition:all .3s ease}.strength-weak{background:linear-gradient(135deg,#fed7d7,#feb2b2);color:#c53030;border-left:4px solid #f56565}.strength-medium{background:linear-gradient(135deg,#fef5e7,#fbd38d);color:#c05621;border-left:4px solid #ed8936}.strength-strong{background:linear-gradient(135deg,#f0fff4,#c6f6d5);color:#2f855a;border-left:4px solid #48bb78}.biometric-section{background:linear-gradient(135deg,rgba(255,255,255,0.8),rgba(248,250,252,0.8));backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.2);padding:32px;border-radius:16px;margin:24px 0;box-shadow:0 8px 32px rgba(0,0,0,.04)}.biometric-title{font-size:20px;font-weight:700;color:var(--text-primary);margin-bottom:16px;display:flex;align-items:center;gap:12px}.biometric-icon{width:32px;height:32px;border-radius:8px;background:var(--primary-gradient);display:flex;align-items:center;justify-content:center;font-size:16px}.typing-area{background:rgba(255,255,255,0.9);border:2px solid #e2e8f0;border-radius:12px;padding:24px;margin:16px 0;position:relative;transition:all .3s ease;backdrop-filter:blur(8px)}.typing-area:focus-within{border-color:var(--accent-blue);box-shadow:0 0 0 4px rgba(102,126,234,.1)}.typing-area input,.typing-area textarea{border:none;background:transparent;width:100%;font-size:16px;font-weight:500;color:var(--text-primary);resize:none;font-family:'SF Mono','Monaco','Cascadia Code',monospace}.typing-area input:focus,.typing-area textarea:focus{outline:none}.mouse-capture-area{background:linear-gradient(135deg,#f7fafc,#edf2f7);border:3px dashed #cbd5e0;border-radius:16px;height:280px;position:relative;margin:20px 0;cursor:crosshair;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--text-secondary);font-weight:600;transition:all .3s ease;backdrop-filter:blur(8px)}.mouse-capture-area:hover{border-color:var(--accent-blue);background:linear-gradient(135deg,rgba(102,126,234,.05),rgba(118,75,162,.05))}.camera-section{text-align:center;background:rgba(255,255,255,0.9);padding:32px;border-radius:16px;border:2px solid #e2e8f0;backdrop-filter:blur(8px)}#video{width:100%;max-width:400px;height:300px;border-radius:12px;background:linear-gradient(135deg,#2d3748,#1a202c);margin:20px 0;object-fit:cover;box-shadow:0 8px 32px rgba(0,0,0,.12)}.camera-controls{display:flex;gap:16px;justify-content:center;margin:24px 0}.btn{padding:12px 24px;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:all .3s cubic-bezier(.4,0,.2,1);display:flex;align-items:center;gap:8px;letter-spacing:.025em;text-transform:uppercase}.btn-primary{background:var(--primary-gradient);color:white;box-shadow:0 4px 12px rgba(102,126,234,.3)}.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(102,126,234,.4)}.btn-secondary{background:rgba(108,117,125,.1);color:var(--text-secondary);border:1px solid #e2e8f0}.btn-secondary:hover{background:rgba(108,117,125,.15);transform:translateY(-1px)}.btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important;box-shadow:none!important}.metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-top:24px}.metric-card{background:rgba(255,255,255,0.9);backdrop-filter:blur(8px);padding:20px;border-radius:12px;text-align:center;border:1px solid rgba(255,255,255,.2);box-shadow:0 4px 16px rgba(0,0,0,.04);transition:all .3s ease;position:relative;overflow:hidden}.metric-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--primary-gradient)}.metric-card:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.08)}.metric-title{color:var(--text-muted);margin-bottom:8px;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.1em}.metric-value{font-size:24px;font-weight:700;color:var(--text-primary);margin-bottom:4px}.metric-unit{font-size:12px;color:var(--text-muted);font-weight:500}.facial-captures{display:flex;gap:12px;margin-top:20px;flex-wrap:wrap;justify-content:center}.facial-capture{width:72px;height:72px;border-radius:50%;border:3px solid var(--accent-blue);object-fit:cover;box-shadow:0 4px 16px rgba(102,126,234,.2);transition:all .3s ease}.facial-capture:hover{transform:scale(1.05);box-shadow:0 8px 24px rgba(102,126,234,.3)}.camera-instructions{background:rgba(102,126,234,.05);border:1px solid rgba(102,126,234,.1);border-radius:12px;padding:20px;margin-top:20px}.camera-instructions h4{color:var(--text-primary);font-weight:600;margin-bottom:12px;font-size:16px}.camera-instructions ul{list-style:none;padding:0}.camera-instructions li{color:var(--text-secondary);margin-bottom:8px;padding-left:24px;position:relative;font-size:14px;line-height:1.5}.camera-instructions li::before{content:'→';position:absolute;left:0;color:var(--accent-blue);font-weight:600}.navigation{display:flex;justify-content:space-between;align-items:center;margin-top:48px;padding-top:32px;border-top:1px solid #e2e8f0}.nav-btn{padding:14px 32px;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:all .3s cubic-bezier(.4,0,.2,1);letter-spacing:.025em;text-transform:uppercase}.nav-btn-secondary{background:transparent;color:var(--text-secondary);border:2px solid #e2e8f0}.nav-btn-secondary:hover{background:rgba(108,117,125,.05);border-color:#cbd5e0}.nav-btn-primary{background:var(--primary-gradient);color:white;box-shadow:0 4px 16px rgba(102,126,234,.3)}.nav-btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(102,126,234,.4)}.nav-btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important;box-shadow:none!important}.mouse-trail{position:absolute;width:8px;height:8px;background:radial-gradient(circle,var(--accent-blue),var(--accent-purple));border-radius:50%;pointer-events:none;animation:trailFade 2.5s ease-out forwards;box-shadow:0 0 12px rgba(102,126,234,.6)}@keyframes trailFade{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(.3)}}.alert{padding:16px 20px;border-radius:12px;margin:20px 0;font-weight:500;font-size:14px;line-height:1.5;backdrop-filter:blur(8px)}.alert-info{background:linear-gradient(135deg,rgba(66,153,225,.1),rgba(49,130,206,.1));color:#2c5282;border:1px solid rgba(66,153,225,.2);border-left:4px solid #4299e1}.alert-warning{background:linear-gradient(135deg,rgba(237,137,54,.1),rgba(221,107,32,.1));color:#c05621;border:1px solid rgba(237,137,54,.2);border-left:4px solid #ed8936}.alert-success{background:linear-gradient(135deg,rgba(72,187,120,.1),rgba(56,161,105,.1));color:#2f855a;border:1px solid rgba(72,187,120,.2);border-left:4px solid #48bb78}.enrollment-complete{text-align:center;padding:48px 32px}.success-icon{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#48bb78,#38a169);display:flex;align-items:center;justify-content:center;font-size:32px;color:white;margin:0 auto 24px;box-shadow:0 8px 32px rgba(72,187,120,.3);animation:successPulse 2s ease-in-out infinite}@keyframes successPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}.profile-summary{background:linear-gradient(135deg,rgba(255,255,255,0.9),rgba(248,250,252,0.9));backdrop-filter:blur(16px);padding:32px;border-radius:16px;margin-top:32px;text-align:left;border:1px solid rgba(255,255,255,.2);box-shadow:0 8px 32px rgba(0,0,0,.08)}.profile-summary h3{color:var(--text-primary);font-size:20px;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:12px}.profile-summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}.profile-summary p{color:var(--text-secondary);margin-bottom:12px;font-size:14px;font-weight:500;display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(226,232,240,.5)}.profile-summary strong{color:var(--text-primary)}.profile-summary span{font-weight:600;color:var(--accent-blue)}.final-actions{display:flex;gap:16px;justify-content:center;margin-top:32px}.canvas-container{display:none}.step-indicator{position:absolute;top:24px;right:24px;background:rgba(255,255,255,.1);backdrop-filter:blur(8px);padding:8px 16px;border-radius:20px;font-size:12px;font-weight:600;color:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.1)}@media(max-width:768px){.enrollment-container{padding:32px 24px;margin:16px}.brand-header{position:relative;top:auto;left:auto;margin-bottom:32px;justify-content:center}.form-grid{grid-template-columns:1fr}.metrics-grid{grid-template-columns:repeat(2,1fr)}.camera-controls{flex-direction:column;align-items:center}.final-actions{flex-direction:column;align-items:center}}.security-badge{position:absolute;bottom:32px;right:32px;display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.1);backdrop-filter:blur(8px);padding:8px 16px;border-radius:20px;font-size:12px;font-weight:600;color:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.1)}.security-icon{width:16px;height:16px;color:#48bb78}.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(26,32,44,.8);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;z-index:9999}.loading-spinner{width:48px;height:48px;border:4px solid rgba(255,255,255,.1);border-left:4px solid #667eea;border-radius:50%;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+  </style>
+</head>
+<body>
+  <div class="brand-header">
+    <div class="brand-logo">SA</div>
+    <div class="brand-info">
+      <h1>SecureAuth Enterprise</h1>
+      <p>Behavioral Authentication Platform</p>
+    </div>
+  </div>
+
+  <div class="step-indicator">Enterprise Security Platform</div>
+
+  <div class="security-badge"><div class="security-icon">🔒</div><span>256-bit Encrypted</span></div>
+
+  <div class="loading-overlay" id="loadingOverlay"><div class="loading-spinner"></div></div>
+
+  <div class="enrollment-container">
+    <div class="header">
+      <h1 class="header-title">Behavioral Identity Enrollment</h1>
+      <p class="header-subtitle">Create your unique biometric authentication profile with enterprise-grade security</p>
+
+      <div class="progress-container">
+        <div class="progress-steps">
+          <div class="progress-line" id="progressLine"></div>
+          <div class="progress-step active" id="progressStep1">1</div>
+          <div class="progress-step" id="progressStep2">2</div>
+          <div class="progress-step" id="progressStep3">3</div>
+          <div class="progress-step" id="progressStep4">4</div>
+          <div class="progress-step" id="progressStep5">5</div>
+        </div>
+        <div class="step-labels">
+          <div class="step-label active">Account Setup</div>
+          <div class="step-label">Keystroke Analysis</div>
+          <div class="step-label">Mouse Dynamics</div>
+          <div class="step-label">Facial Recognition</div>
+          <div class="step-label">Profile Complete</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Steps (same as your markup) -->
+    <!-- Step 1 -->
+    <div class="step active" id="step1">
+      <div class="step-header">
+        <h2 class="step-title">Enterprise Account Configuration</h2>
+        <p class="step-description">Establish your secure identity credentials with military-grade encryption and enterprise compliance standards.</p>
+      </div>
+      <div class="alert alert-info"><strong>🛡️ Enterprise Security:</strong> All data is encrypted using AES-256 encryption and stored in SOC 2 compliant infrastructure. Your privacy and security are our top priority.</div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label" for="userId">Enterprise User ID</label>
+          <input type="text" id="userId" class="form-input" placeholder="Enter unique identifier" required>
+          <div class="form-help">This will be your universal identity across all integrated applications</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="email">Corporate Email Address</label>
+          <input type="email" id="email" class="form-input" placeholder="user@company.com" required>
+          <div class="form-help">Used for account verification and security notifications</div>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label" for="password">Master Security Passphrase</label>
+          <input type="password" id="password" class="form-input" placeholder="Create a strong passphrase" required>
+          <div id="passwordStrength" class="password-strength" style="display:none;"></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="confirmPassword">Confirm Passphrase</label>
+          <input type="password" id="confirmPassword" class="form-input" placeholder="Re-enter your passphrase" required>
+          <div class="form-help">Must match your master passphrase exactly</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="step" id="step2">
+      <div class="step-header">
+        <h2 class="step-title">Keystroke Dynamics Analysis</h2>
+        <p class="step-description">Advanced biometric analysis of your unique typing patterns using machine learning algorithms to create your behavioral signature.</p>
+      </div>
+      <div class="alert alert-info"><strong>🤖 AI-Powered Analysis:</strong> Our advanced algorithms analyze over 50 different keystroke metrics including dwell time, flight time, typing rhythm, and pressure variations to create your unique biometric profile.</div>
+
+      <div class="biometric-section">
+        <h3 class="biometric-title"><div class="biometric-icon">⌨️</div>Keystroke Pattern Capture</h3>
+        <p style="margin-bottom:24px;color:var(--text-secondary);font-weight:500;">Complete all three typing exercises to establish your comprehensive keystroke baseline. Type naturally as you normally would.</p>
+
+        <div class="form-group">
+          <label class="form-label">Authentication Credential Sample</label>
+          <div class="typing-area"><input type="text" id="keystrokeUserId" placeholder="Type your Enterprise User ID here" style="font-size:18px;font-weight:600;"></div>
+          <div class="form-help">This helps establish your credential-specific typing pattern</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Standard Biometric Phrase</label>
+          <div class="typing-area"><textarea id="keystrokePhrase" placeholder='Type exactly: "The quick brown fox jumps over the lazy dog near the riverbank during the morning sunshine"' rows="3" style="font-size:16px;line-height:1.6;"></textarea></div>
+          <div class="form-help">Standardized text for consistent biometric analysis</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Personal Expression Sample</label>
+          <div class="typing-area"><textarea id="personalText" placeholder="Write a detailed paragraph about your professional background or favorite work methodology (minimum 100 words)" rows="4" style="font-size:16px;line-height:1.6;"></textarea></div>
+          <div class="form-help">Personal content helps capture your natural writing style and rhythm</div>
+        </div>
+
+        <div class="metrics-grid">
+          <div class="metric-card"><div class="metric-title">Average Dwell Time</div><div class="metric-value" id="dwellTime">0</div><div class="metric-unit">milliseconds</div></div>
+          <div class="metric-card"><div class="metric-title">Average Flight Time</div><div class="metric-value" id="flightTime">0</div><div class="metric-unit">milliseconds</div></div>
+          <div class="metric-card"><div class="metric-title">Typing Velocity</div><div class="metric-value" id="typingSpeed">0</div><div class="metric-unit">WPM</div></div>
+          <div class="metric-card"><div class="metric-title">Pattern Confidence</div><div class="metric-value" id="patternStrength">Building...</div><div class="metric-unit">analysis</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="step" id="step3">
+      <div class="step-header">
+        <h2 class="step-title">Mouse Dynamics & Movement Analysis</h2>
+        <p class="step-description">Capture your unique mouse movement patterns, click behaviors, and interaction dynamics for comprehensive behavioral authentication.</p>
+      </div>
+      <div class="alert alert-info"><strong>🖱️ Advanced Tracking:</strong> Our system analyzes mouse velocity, acceleration, movement trajectories, click patterns, and micro-movements to create a unique behavioral fingerprint.</div>
+
+      <div class="biometric-section">
+        <h3 class="biometric-title"><div class="biometric-icon">🎯</div>Mouse Movement Pattern Collection</h3>
+        <p style="margin-bottom:20px;color:var(--text-secondary);font-weight:500;">Move your mouse naturally within the capture area. Perform various movements: circles, straight lines, curves, and clicking patterns.</p>
+
+        <div class="mouse-capture-area" id="mouseCaptureArea">
+          <div style="text-align:center;pointer-events:none;">
+            <div style="font-size:18px;margin-bottom:8px;">🎯 Mouse Behavior Capture Zone</div>
+            <div>Move your mouse here and click occasionally</div>
+            <div style="margin-top:12px;font-size:14px;opacity:0.8;">Time remaining: <span id="mouseTimer" style="font-weight:700;color:var(--accent-blue);">45s</span></div>
+          </div>
+        </div>
+
+        <div class="metrics-grid">
+          <div class="metric-card"><div class="metric-title">Average Velocity</div><div class="metric-value" id="mouseVelocity">0</div><div class="metric-unit">px/second</div></div>
+          <div class="metric-card"><div class="metric-title">Movement Style</div><div class="metric-value" id="movementStyle">Analyzing...</div><div class="metric-unit">pattern</div></div>
+          <div class="metric-card"><div class="metric-title">Click Dynamics</div><div class="metric-value" id="clickPattern">0</div><div class="metric-unit">interactions</div></div>
+          <div class="metric-card"><div class="metric-title">Movement Smoothness</div><div class="metric-value" id="mouseSmoothness">0</div><div class="metric-unit">percent</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="step" id="step4">
+      <div class="step-header">
+        <h2 class="step-title">Facial Biometric Authentication</h2>
+        <p class="step-description">Advanced facial recognition using deep learning algorithms to capture unique facial features and create a secure biometric template.</p>
+      </div>
+      <div class="alert alert-warning"><strong>🎥 Privacy & Security:</strong> Facial data is processed locally and encrypted before storage. We use advanced privacy-preserving techniques to protect your biometric information.</div>
+
+      <div class="biometric-section">
+        <div class="camera-section">
+          <h3 class="biometric-title"><div class="biometric-icon">📷</div>Multi-Angle Facial Capture</h3>
+          <video id="video" autoplay muted playsinline></video>
+          <canvas id="canvas" class="canvas-container"></canvas>
+
+          <div class="camera-controls">
+            <button class="btn btn-secondary" id="startCamera"><span>📹</span>Initialize Camera</button>
+            <button class="btn btn-primary" id="capturePhoto" disabled><span>📸</span> Capture Image (<span id="captureCount">0</span>/5)</button>
+          </div>
+
+          <div class="facial-captures" id="facialCaptures"></div>
+
+          <div class="camera-instructions">
+            <h4>📋 Capture Instructions</h4>
+            <ul>
+              <li>Ensure good lighting and look directly at the camera</li>
+              <li>Position 1: Face the camera directly with neutral expression</li>
+              <li>Position 2: Turn head slightly left (15-20 degrees)</li>
+              <li>Position 3: Turn head slightly right (15-20 degrees)</li>
+              <li>Position 4: Tilt head slightly up while facing forward</li>
+              <li>Position 5: Return to center with a slight smile</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 5 -->
+    <div class="step" id="step5">
+      <div class="enrollment-complete">
+        <div class="success-icon">✅</div>
+        <h2 style="color:var(--text-primary);margin-bottom:16px;font-size:32px;font-weight:700;">Behavioral Profile Successfully Created</h2>
+        <p style="color:var(--text-secondary);font-size:18px;margin-bottom:32px;">Your enterprise-grade behavioral authentication profile is now active and ready for deployment across integrated applications.</p>
+
+        <div class="profile-summary">
+          <h3><div class="biometric-icon">📊</div>Enterprise Profile Analytics</h3>
+          <div class="profile-summary-grid">
+            <div>
+              <p><strong>Enterprise User ID:</strong> <span id="summaryUserId">-</span></p>
+              <p><strong>Email Address:</strong> <span id="summaryEmail">-</span></p>
+              <p><strong>Security Level:</strong> <span>Enterprise Grade</span></p>
+            </div>
+            <div>
+              <p><strong>Keystroke Patterns:</strong> <span id="summaryKeystroke">✓ Captured</span></p>
+              <p><strong>Mouse Dynamics:</strong> <span id="summaryMouse">✓ Analyzed</span></p>
+              <p><strong>Facial Recognition:</strong> <span id="summaryFacial">✓ 5 Templates</span></p>
+            </div>
+          </div>
+          <div style="margin-top:24px;padding-top:24px;border-top:1px solid #e2e8f0;">
+            <p><strong>Profile Confidence Score:</strong> <span id="profileStrengthFinal" style="font-size:18px;">98.7% (Excellent)</span></p>
+            <p><strong>Enrollment Completed:</strong> <span id="creationDate">-</span></p>
+            <p><strong>Next Authentication:</strong> <span>Ready for immediate use</span></p>
+          </div>
+        </div>
+
+        <div class="alert alert-success"><strong>🚀 Ready for Deployment:</strong> Your behavioral profile can now authenticate you across all SecureAuth Enterprise integrated applications. Experience passwordless, continuous authentication with unparalleled security.</div>
+
+        <div class="final-actions">
+          <button class="btn btn-secondary" id="downloadProfile"><span>💾</span>Export Profile Data</button>
+          <button class="btn btn-primary" id="finishEnrollment"><span>🎯</span>Launch Dashboard</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="navigation">
+      <button class="nav-btn nav-btn-secondary" id="prevBtn" onclick="previousStep()" style="display:none;">← Previous Step</button>
+      <button class="nav-btn nav-btn-primary" id="nextBtn" onclick="nextStep()">Continue →</button>
+    </div>
+  </div>
+
+  <script>
+    // ---------- State ----------
+    let currentStep = 1;
+    const totalSteps = 5;
+    let userProfile = {};
+    // raw data storage
+    const rawKeystrokes = [];
+    const rawMouse = [];
+    const rawFacial = [];
+
+    // keystroke tracking
+    let keyEvents = []; // stores down/up events
+    let totalDwellTime = 0;
+    let totalFlightTime = 0;
+    let keyCount = 0;
+    let flightCount = 0;
+    let startTime = Date.now();
+    let charCount = 0;
+
+    // mouse tracking
+    let mousePositions = [];
+    let mouseTimer = 45;
+    let mouseTrackingActive = false;
+    let clickCount = 0;
+    let totalVelocity = 0;
+    let velocityCount = 0;
+    let mouseTimerInterval = null;
+
+    // camera
+    let stream = null;
+    let capturedPhotos = 0;
+    const maxPhotos = 5;
+
+    // ---------- Init ----------
+    document.addEventListener('DOMContentLoaded', () => {
+      updateProgress();
+      setupEventListeners();
+    });
+
+    function setupEventListeners() {
+      const pwd = document.getElementById('password');
+      if (pwd) pwd.addEventListener('input', checkPasswordStrength);
+
+      ['keystrokeUserId','keystrokePhrase','personalText'].forEach(id=>{
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener('keydown', trackKeyDown);
+        el.addEventListener('keyup', trackKeyUp);
+      });
+
+      const mouseArea = document.getElementById('mouseCaptureArea');
+      if (mouseArea) {
+        mouseArea.addEventListener('mousemove', trackMouse);
+        mouseArea.addEventListener('click', trackClick);
+      }
+
+      const startCameraBtn = document.getElementById('startCamera');
+      const captureBtn = document.getElementById('capturePhoto');
+      if (startCameraBtn) startCameraBtn.addEventListener('click', startCamera);
+      if (captureBtn) captureBtn.addEventListener('click', capturePhoto);
+
+      const downloadBtn = document.getElementById('downloadProfile');
+      const finishBtn = document.getElementById('finishEnrollment');
+      if (downloadBtn) downloadBtn.addEventListener('click', downloadProfile);
+      if (finishBtn) finishBtn.addEventListener('click', finishEnrollment);
+    }
+
+    function showLoading(show=true){
+      const el = document.getElementById('loadingOverlay');
+      if (el) el.style.display = show ? 'flex' : 'none';
+    }
+
+    // ---------- Progress UI ----------
+    function updateProgress(){
+      const progress = ((currentStep - 1) / (totalSteps - 1)) * 100;
+      const line = document.getElementById('progressLine');
+      if (line) line.style.width = progress + '%';
+
+      for (let i=1;i<=totalSteps;i++){
+        const stepEl = document.getElementById(`progressStep${i}`);
+        const labelEl = document.querySelectorAll('.step-label')[i-1];
+        if (!stepEl || !labelEl) continue;
+        stepEl.classList.remove('active','completed');
+        labelEl.classList.remove('active');
+        if (i < currentStep) stepEl.classList.add('completed');
+        else if (i === currentStep) { stepEl.classList.add('active'); labelEl.classList.add('active'); }
+      }
+    }
+
+    function showStep(step){
+      document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
+      const target = document.getElementById('step' + step);
+      if (target) target.classList.add('active');
+
+      document.getElementById('prevBtn').style.display = step > 1 ? 'block' : 'none';
+      const nextBtn = document.getElementById('nextBtn');
+      if (nextBtn) nextBtn.textContent = step === totalSteps ? '🎯 Complete Setup' : 'Continue →';
+
+      if (step === 3) {
+        // start mouse timer once
+        if (!mouseTrackingActive) startMouseTimer();
+      }
+
+      updateProgress();
+    }
+
+    function nextStep(){
+      showLoading(true);
+      setTimeout(()=>{
+        if (validateCurrentStep()){
+          if (currentStep < totalSteps) {
+            currentStep++;
+            showStep(currentStep);
+          } else {
+            completeEnrollment();
+          }
+        }
+        showLoading(false);
+      }, 500);
+    }
+
+    function previousStep(){
+      if (currentStep > 1){ currentStep--; showStep(currentStep); }
+    }
+
+    function validateCurrentStep(){
+      switch (currentStep){
+        case 1: {
+          const userId = document.getElementById('userId').value.trim();
+          const email = document.getElementById('email').value.trim();
+          const password = document.getElementById('password').value;
+          const confirmPassword = document.getElementById('confirmPassword').value;
+          if (!userId || !email || !password || !confirmPassword) { alert('⚠️ Please complete all required fields'); return false; }
+          if (password !== confirmPassword) { alert('🔐 Passphrases do not match'); return false; }
+          if (password.length < 8) { alert('🔒 Passphrase must be at least 8 characters long'); return false; }
+          userProfile.userId = userId; userProfile.email = email; userProfile.password = password;
+          return true;
+        }
+
+        case 2: {
+          if (keyCount < 75) { alert('⌨️ Please complete more typing to establish a robust keystroke pattern (minimum 75 keystrokes)'); return false; }
+          const personalTextLength = document.getElementById('personalText').value.length;
+          if (personalTextLength < 100) { alert('📝 Personal text sample must be at least 100 characters'); return false; }
+          userProfile.keystrokePattern = {
+            avgDwellTime: Math.round(totalDwellTime / Math.max(1, keyCount)),
+            avgFlightTime: flightCount > 0 ? Math.round(totalFlightTime / flightCount) : 0,
+            typingSpeed: Math.round((charCount / 5) / ((Date.now() - startTime) / 60000)),
+            samples: keyEvents.length,
+            confidence: keyCount > 100 ? 'High' : 'Medium'
+          };
+          return true;
+        }
+
+        case 3: {
+          if (mouseTimer > 0) { alert('🖱️ Please complete the full mouse movement exercise'); return false; }
+          if (clickCount < 5) { alert('🎯 Please perform at least 5 clicks during the mouse exercise'); return false; }
+          userProfile.mousePattern = {
+            avgVelocity: velocityCount > 0 ? Math.round(totalVelocity / velocityCount) : 0,
+            clickCount: clickCount,
+            smoothness: calculateSmoothness(),
+            samples: mousePositions.length,
+            confidence: clickCount >= 5 && mousePositions.length > 100 ? 'High' : 'Medium'
+          };
+          return true;
+        }
+
+        case 4: {
+          if (capturedPhotos < maxPhotos) { alert(`📷 Please capture all ${maxPhotos} facial recognition images`); return false; }
+          userProfile.facialPattern = { photos: capturedPhotos, timestamp: Date.now(), confidence: 'High' };
+          return true;
+        }
+
+        default: return true;
+      }
+    }
+
+    // ---------- Password Strength ----------
+    function checkPasswordStrength(){
+      const password = document.getElementById('password').value;
+      const strengthElement = document.getElementById('passwordStrength');
+      if (!strengthElement) return;
+      if (password.length === 0) { strengthElement.style.display = 'none'; return; }
+      let strength = 0; const feedback = [];
+      if (password.length >= 8) strength++; else feedback.push('at least 8 characters');
+      if (/[A-Z]/.test(password)) strength++; else feedback.push('uppercase letters');
+      if (/[a-z]/.test(password)) strength++; else feedback.push('lowercase letters');
+      if (/[0-9]/.test(password)) strength++; else feedback.push('numbers');
+      if (/[^A-Za-z0-9]/.test(password)) strength++; else feedback.push('special characters');
+      strengthElement.style.display = 'block';
+      if (strength < 3) { strengthElement.className = 'password-strength strength-weak'; strengthElement.textContent = '🔓 Weak - Add: ' + feedback.join(', '); }
+      else if (strength < 5) { strengthElement.className = 'password-strength strength-medium'; strengthElement.textContent = '🔐 Medium - Consider adding: ' + feedback.join(', '); }
+      else { strengthElement.className = 'password-strength strength-strong'; strengthElement.textContent = '🔒 Strong passphrase - Enterprise grade security ✓'; }
+    }
+
+    // ---------- Keystroke tracking ----------
+    function trackKeyDown(event){
+      const currentTime = Date.now();
+      const id = event.target && event.target.id ? event.target.id : null;
+      // Save raw down event
+      rawKeystrokes.push({ key: event.key, type: 'down', time: currentTime, target: id });
+      keyEvents.push({ key: event.key, type: 'down', time: currentTime, target: id });
+      // keep keyEvents length reasonable
+      if (keyEvents.length > 500) keyEvents = keyEvents.slice(-500);
+    }
+
+    function trackKeyUp(event){
+      const currentTime = Date.now();
+      const id = event.target && event.target.id ? event.target.id : null;
+      // Save raw up event
+      rawKeystrokes.push({ key: event.key, type: 'up', time: currentTime, target: id });
+      keyEvents.push({ key: event.key, type: 'up', time: currentTime, target: id });
+
+      // Find the most recent matching down event for this key (search backwards)
+      for (let i = keyEvents.length - 2; i >= 0; i--) {
+        const e = keyEvents[i];
+        if (e.key === event.key && e.type === 'down') {
+          const dwellTime = currentTime - e.time;
+          totalDwellTime += dwellTime;
+          keyCount++;
+          // flight time: find previous up event before that down event
+          for (let j = i - 1; j >= 0; j--) {
+            if (keyEvents[j].type === 'up') {
+              const flightTime = e.time - keyEvents[j].time;
+              totalFlightTime += flightTime;
+              flightCount++;
+              break;
+            }
+          }
+          break;
+        }
+      }
+
+      charCount++;
+      updateKeystrokeMetrics();
+    }
+
+    function updateKeystrokeMetrics(){
+      const avgDwellTime = keyCount > 0 ? Math.round(totalDwellTime / keyCount) : 0;
+      const avgFlightTime = flightCount > 0 ? Math.round(totalFlightTime / flightCount) : 0;
+      const elapsedMinutes = (Date.now() - startTime) / 60000;
+      const wpm = elapsedMinutes > 0 ? Math.round((charCount / 5) / elapsedMinutes) : 0;
+      const dwellEl = document.getElementById('dwellTime');
+      const flightEl = document.getElementById('flightTime');
+      const typingEl = document.getElementById('typingSpeed');
+      const patternEl = document.getElementById('patternStrength');
+      if (dwellEl) dwellEl.textContent = avgDwellTime;
+      if (flightEl) flightEl.textContent = avgFlightTime;
+      if (typingEl) typingEl.textContent = wpm;
+      let strengthText = 'Building...';
+      if (keyCount > 25) strengthText = 'Good';
+      if (keyCount > 50) strengthText = 'Strong';
+      if (keyCount > 75) strengthText = 'Excellent';
+      if (patternEl) patternEl.textContent = strengthText;
+    }
+
+    // ---------- Mouse tracking ----------
+    function startMouseTimer(){
+      mouseTrackingActive = true;
+      mouseTimer = 45;
+      document.getElementById('mouseTimer').textContent = mouseTimer + 's';
+      if (mouseTimerInterval) clearInterval(mouseTimerInterval);
+      mouseTimerInterval = setInterval(()=>{
+        mouseTimer--;
+        const t = document.getElementById('mouseTimer');
+        if (t) t.textContent = mouseTimer + 's';
+        if (mouseTimer <= 0){
+          clearInterval(mouseTimerInterval);
+          const wrapper = document.querySelector('#mouseCaptureArea div');
+          if (wrapper) wrapper.innerHTML = '<div style="font-size:18px;color:var(--success);">✅ Mouse Tracking Complete!</div><div style="margin-top:8px;">Advanced behavioral patterns captured successfully</div>';
+        }
+      }, 1000);
+    }
+
+    function trackMouse(event){
+      if (mouseTimer <= 0) return;
+      const rect = event.currentTarget.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+      const currentTime = Date.now();
+      rawMouse.push({ x, y, time: currentTime });
+      if (mousePositions.length > 0){
+        const last = mousePositions[mousePositions.length - 1];
+        const dist = Math.hypot(x - last.x, y - last.y);
+        const dt = currentTime - last.time;
+        if (dt > 0){
+          const velocity = (dist / dt) * 1000;
+          totalVelocity += velocity;
+          velocityCount++;
+        }
+      }
+      mousePositions.push({ x, y, time: currentTime });
+      if (mousePositions.length > 150) mousePositions = mousePositions.slice(-150);
+      createMouseTrail(x, y);
+      updateMouseMetrics();
+    }
+
+    function createMouseTrail(x,y){
+      const trail = document.createElement('div');
+      trail.className = 'mouse-trail';
+      trail.style.left = x + 'px';
+      trail.style.top = y + 'px';
+      const area = document.getElementById('mouseCaptureArea');
+      area.appendChild(trail);
+      setTimeout(()=>{ if (trail.parentNode) trail.parentNode.removeChild(trail); }, 2500);
+    }
+
+    function trackClick(event){
+      if (mouseTimer > 0){
+        clickCount++;
+        updateMouseMetrics();
+        const rect = event.currentTarget.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        const clickEffect = document.createElement('div');
+        clickEffect.style.position = 'absolute';
+        clickEffect.style.left = x + 'px';
+        clickEffect.style.top = y + 'px';
+        clickEffect.style.width = '20px';
+        clickEffect.style.height = '20px';
+        clickEffect.style.borderRadius = '50%';
+        clickEffect.style.background = 'rgba(102,126,234,0.6)';
+        clickEffect.style.border = '2px solid var(--accent-blue)';
+        clickEffect.style.transform = 'translate(-50%,-50%)';
+        clickEffect.style.animation = 'clickPulse .6s ease-out forwards';
+        clickEffect.style.pointerEvents = 'none';
+        document.getElementById('mouseCaptureArea').appendChild(clickEffect);
+        setTimeout(()=>{ if (clickEffect.parentNode) clickEffect.parentNode.removeChild(clickEffect); }, 600);
+      }
+    }
+
+    function updateMouseMetrics(){
+      const avgVelocity = velocityCount > 0 ? Math.round(totalVelocity / velocityCount) : 0;
+      const smoothness = calculateSmoothness();
+      const style = determineMovementStyle();
+      const mv = document.getElementById('mouseVelocity');
+      if (mv) mv.textContent = avgVelocity;
+      const ms = document.getElementById('movementStyle');
+      if (ms) ms.textContent = style;
+      const cp = document.getElementById('clickPattern');
+      if (cp) cp.textContent = clickCount;
+      const sm = document.getElementById('mouseSmoothness');
+      if (sm) sm.textContent = smoothness;
+    }
+
+    function calculateSmoothness(){
+      if (mousePositions.length < 3) return 0;
+      let totalChange = 0, changes = 0;
+      for (let i=2;i<mousePositions.length;i++){
+        const a1 = Math.atan2(mousePositions[i-1].y - mousePositions[i-2].y, mousePositions[i-1].x - mousePositions[i-2].x);
+        const a2 = Math.atan2(mousePositions[i].y - mousePositions[i-1].y, mousePositions[i].x - mousePositions[i-1].x);
+        const diff = Math.abs(a2 - a1);
+        totalChange += diff;
+        changes++;
+      }
+      const avgChange = changes > 0 ? totalChange / changes : 0;
+      return Math.max(0, Math.round(100 - (avgChange * 50)));
+    }
+
+    function determineMovementStyle(){
+      if (mousePositions.length < 10) return 'Analyzing...';
+      const recent = mousePositions.slice(-30);
+      let straight = 0, curves = 0;
+      for (let i=1;i<recent.length-1;i++){
+        const dx1 = recent[i].x - recent[i-1].x;
+        const dy1 = recent[i].y - recent[i-1].y;
+        const dx2 = recent[i+1].x - recent[i].x;
+        const dy2 = recent[i+1].y - recent[i].y;
+        const angle = Math.atan2(dy2,dx2) - Math.atan2(dy1,dx1);
+        if (Math.abs(angle) < 0.3) straight++; else curves++;
+      }
+      return straight > curves ? 'Linear Precision' : 'Curved Organic';
+    }
+
+    // ---------- Camera ----------
+    function startCamera(){
+      showLoading(true);
+      navigator.mediaDevices.getUserMedia({ video: { width:{ideal:640}, height:{ideal:480}, facingMode:'user' } })
+        .then(mediaStream=>{
+          stream = mediaStream;
+          const video = document.getElementById('video');
+          if (video) video.srcObject = stream;
+          document.getElementById('startCamera').disabled = true;
+          document.getElementById('startCamera').textContent = '✅ Camera Active';
+          document.getElementById('capturePhoto').disabled = false;
+          showLoading(false);
+        })
+        .catch(err=>{
+          showLoading(false);
+          alert('❌ Error accessing camera: ' + err.message + '\n\nPlease ensure camera permissions are granted.');
+        });
+    }
+
+    function capturePhoto(){
+      const video = document.getElementById('video');
+      const canvas = document.getElementById('canvas');
+      if (!video || !canvas) return;
+      const ctx = canvas.getContext('2d');
+      canvas.width = video.videoWidth || 640;
+      canvas.height = video.videoHeight || 480;
+      ctx.drawImage(video,0,0);
+      const imageData = canvas.toDataURL('image/jpeg',0.8);
+      rawFacial.push(imageData);
+      const img = document.createElement('img');
+      img.src = imageData;
+      img.className = 'facial-capture';
+      img.alt = `Facial capture ${capturedPhotos+1}`;
+      img.title = `Capture ${capturedPhotos+1}/5 - ${getCaptureInstruction(capturedPhotos+1)}`;
+      document.getElementById('facialCaptures').appendChild(img);
+      capturedPhotos++;
+      document.getElementById('captureCount').textContent = capturedPhotos;
+      if (capturedPhotos < maxPhotos){
+        const nextInstruction = getCaptureInstruction(capturedPhotos+1);
+        document.getElementById('capturePhoto').innerHTML = `<span>📸</span> ${nextInstruction} (${capturedPhotos}/5)`;
+      } else {
+        document.getElementById('capturePhoto').disabled = true;
+        document.getElementById('capturePhoto').innerHTML = '<span>✅</span> All Images Captured';
+        if (stream) stream.getTracks().forEach(t=>t.stop());
+      }
+    }
+
+    function getCaptureInstruction(n){
+      const instructions = ['Face Forward','Turn Left Slightly','Turn Right Slightly','Tilt Up Slightly','Smile & Center'];
+      return instructions[n-1] || 'Capture';
+    }
+
+    // ---------- Complete & Export ----------
+    function completeEnrollment(){
+      document.getElementById('summaryUserId').textContent = userProfile.userId || '-';
+      document.getElementById('summaryEmail').textContent = userProfile.email || '-';
+      document.getElementById('creationDate').textContent = new Date().toLocaleString();
+
+      let totalConfidence=0, factors=0;
+      if (userProfile.keystrokePattern){ totalConfidence += userProfile.keystrokePattern.confidence==='High'?95:85; factors++; }
+      if (userProfile.mousePattern){ totalConfidence += userProfile.mousePattern.confidence==='High'?95:85; factors++; }
+      if (userProfile.facialPattern){ totalConfidence += userProfile.facialPattern.confidence==='High'?95:85; factors++; }
+      const overallConfidence = factors>0 ? (totalConfidence / factors).toFixed(1) : 95.0;
+      document.getElementById('profileStrengthFinal').textContent = `${overallConfidence}% (${overallConfidence >=95 ? 'Excellent' : overallConfidence >=90 ? 'Very Good' : 'Good'})`;
+
+      currentStep = 5; showStep(currentStep);
+    }
+
+  // Replace your existing downloadProfile() function with these enhanced versions:
+
+// ---------- Enhanced CSV Export ----------
+function downloadProfile() {
+    showLoading(true);
+
+    setTimeout(() => {
+        try {
+            const csvRows = [];
+
+            // Header row
+            csvRows.push(["Category", "Field", "Value"].join(","));
+
+            // Identity Information
+            csvRows.push(["Identity", "User ID", escapeCSV(userProfile.userId)].join(","));
+            csvRows.push(["Identity", "Email", escapeCSV(userProfile.email)].join(","));
+            csvRows.push(["Identity", "Enrollment Date", escapeCSV(new Date().toISOString())].join(","));
+
+            // Keystroke Biometric Features
+            if (userProfile.keystrokePattern) {
+                csvRows.push(["Keystroke", "Average Dwell Time", userProfile.keystrokePattern.avgDwellTime].join(","));
+                csvRows.push(["Keystroke", "Average Flight Time", userProfile.keystrokePattern.avgFlightTime].join(","));
+                csvRows.push(["Keystroke", "Typing Speed WPM", userProfile.keystrokePattern.typingSpeed].join(","));
+                csvRows.push(["Keystroke", "Keystroke Sample Count", userProfile.keystrokePattern.samples].join(","));
+                csvRows.push(["Keystroke", "Confidence Level", escapeCSV(userProfile.keystrokePattern.confidence)].join(","));
+            }
+
+            // Mouse Biometric Features
+            if (userProfile.mousePattern) {
+                csvRows.push(["Mouse", "Average Velocity", userProfile.mousePattern.avgVelocity].join(","));
+                csvRows.push(["Mouse", "Smoothness", userProfile.mousePattern.smoothness].join(","));
+                csvRows.push(["Mouse", "Click Count", userProfile.mousePattern.clickCount].join(","));
+                csvRows.push(["Mouse", "Mouse Samples", userProfile.mousePattern.samples].join(","));
+                csvRows.push(["Mouse", "Confidence Level", escapeCSV(userProfile.mousePattern.confidence)].join(","));
+            }
+
+            // Facial Biometric Features
+            if (userProfile.facialPattern) {
+                csvRows.push(["Facial", "Photos Captured", userProfile.facialPattern.photos].join(","));
+                csvRows.push(["Facial", "Capture Timestamp", userProfile.facialPattern.timestamp].join(","));
+                csvRows.push(["Facial", "Confidence Level", escapeCSV(userProfile.facialPattern.confidence)].join(","));
+            }
+
+            // Raw Biometric Data (Base64 encoded)
+            const encode = data => btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+
+            csvRows.push(["RawData", "Keystrokes (base64)", escapeCSV(encode(rawKeystrokes))].join(","));
+            csvRows.push(["RawData", "Mouse (base64)", escapeCSV(encode(rawMouse))].join(","));
+            csvRows.push(["RawData", "Facial (base64)", escapeCSV(encode(rawFacial))].join(","));
+
+            // Metadata
+            csvRows.push(["Metadata", "Total Records", csvRows.length - 1].join(","));
+            csvRows.push(["Metadata", "Export Format", "CSV v1.0"].join(","));
+            csvRows.push(["Metadata", "Platform", "SecureAuth Enterprise"].join(","));
+
+            // Convert to CSV string
+            const csvString = csvRows.join("\n");
+
+            // Create download
+            const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            
+            link.setAttribute("href", url);
+            link.setAttribute("download", `SecureAuth_Profile_${userProfile.userId}_${Date.now()}.csv`);
+            link.style.visibility = "hidden";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            showLoading(false);
+            
+            // Show success message
+            alert(`✅ Profile exported successfully!\n\nFile: SecureAuth_Profile_${userProfile.userId}_${Date.now()}.csv\nFormat: CSV\nSize: ${(csvString.length / 1024).toFixed(2)} KB`);
+            
+        } catch (error) {
+            showLoading(false);
+            alert('❌ Export failed: ' + error.message);
+            console.error('Export error:', error);
+        }
+    }, 600);
+}
+
+// ---------- CSV Helper Function ----------
+function escapeCSV(value) {
+    if (value === null || value === undefined) return '';
+    const str = String(value);
+    // If contains comma, newline, or quote, wrap in quotes and escape internal quotes
+    if (str.includes(',') || str.includes('\n') || str.includes('"') || str.includes('\r')) {
+        return '"' + str.replace(/"/g, '""') + '"';
+    }
+    return str;
+}
+
+// ---------- NEW: JSON Export Function ----------
+function downloadProfileJSON() {
+    showLoading(true);
+
+    setTimeout(() => {
+        try {
+            // Create comprehensive profile object
+            const profileData = {
+                version: "1.0",
+                platform: "SecureAuth Enterprise",
+                exportDate: new Date().toISOString(),
+                user: {
+                    userId: userProfile.userId,
+                    email: userProfile.email,
+                    enrollmentDate: new Date().toISOString()
+                },
+                biometrics: {
+                    keystroke: userProfile.keystrokePattern || null,
+                    mouse: userProfile.mousePattern || null,
+                    facial: userProfile.facialPattern || null
+                },
+                rawData: {
+                    keystrokes: rawKeystrokes,
+                    mouse: rawMouse,
+                    facial: rawFacial
+                },
+                statistics: {
+                    totalKeystrokeSamples: rawKeystrokes.length,
+                    totalMouseSamples: rawMouse.length,
+                    totalFacialSamples: rawFacial.length,
+                    overallConfidence: calculateOverallConfidence()
+                }
+            };
+
+            // Convert to JSON string with formatting
+            const jsonString = JSON.stringify(profileData, null, 2);
+
+            // Create download
+            const blob = new Blob([jsonString], { type: "application/json;charset=utf-8;" });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            
+            link.setAttribute("href", url);
+            link.setAttribute("download", `SecureAuth_Profile_${userProfile.userId}_${Date.now()}.json`);
+            link.style.visibility = "hidden";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            showLoading(false);
+            
+            // Show success message
+            alert(`✅ Profile exported successfully!\n\nFile: SecureAuth_Profile_${userProfile.userId}_${Date.now()}.json\nFormat: JSON\nSize: ${(jsonString.length / 1024).toFixed(2)} KB`);
+            
+        } catch (error) {
+            showLoading(false);
+            alert('❌ Export failed: ' + error.message);
+            console.error('Export error:', error);
+        }
+    }, 600);
+}
+
+// ---------- Helper: Calculate Overall Confidence ----------
+function calculateOverallConfidence() {
+    let totalConfidence = 0;
+    let factors = 0;
+
+    if (userProfile.keystrokePattern) {
+        totalConfidence += userProfile.keystrokePattern.confidence === 'High' ? 95 : 85;
+        factors++;
+    }
+    if (userProfile.mousePattern) {
+        totalConfidence += userProfile.mousePattern.confidence === 'High' ? 95 : 85;
+        factors++;
+    }
+    if (userProfile.facialPattern) {
+        totalConfidence += userProfile.facialPattern.confidence === 'High' ? 95 : 85;
+        factors++;
+    }
+
+    return factors > 0 ? (totalConfidence / factors).toFixed(1) + '%' : 'N/A';
+}
+
+// ---------- NEW: Export with Format Selection ----------
+function downloadProfileWithOptions() {
+    const format = prompt('Choose export format:\n\n1. CSV (Comma-Separated Values)\n2. JSON (JavaScript Object Notation)\n3. Both\n\nEnter 1, 2, or 3:', '1');
+    
+    if (format === '1') {
+        downloadProfile(); // CSV only
+    } else if (format === '2') {
+        downloadProfileJSON(); // JSON only
+    } else if (format === '3') {
+        downloadProfile(); // Export CSV
+        setTimeout(() => downloadProfileJSON(), 1000); // Then export JSON
+    } else if (format !== null) {
+        alert('Invalid selection. Please choose 1, 2, or 3.');
+    }
+}
+
+// ---------- UPDATE YOUR HTML BUTTON ----------
+// Replace the download button event listener in setupEventListeners():
+/*
+OLD:
+if (downloadBtn) downloadBtn.addEventListener('click', downloadProfile);
+
+NEW (for format selection):
+if (downloadBtn) downloadBtn.addEventListener('click', downloadProfileWithOptions);
+
+OR (for CSV only - default):
+if (downloadBtn) downloadBtn.addEventListener('click', downloadProfile);
+
+OR (for JSON only):
+if (downloadBtn) downloadBtn.addEventListener('click', downloadProfileJSON);
+*/
+
+    function finishEnrollment(){
+      showLoading(true);
+      setTimeout(()=>{
+        alert('🎉 Welcome to SecureAuth Enterprise! Your behavioral authentication profile is now active.');
+        showLoading(false);
+        window.location.href = '#dashboard';
+      }, 800);
+    }
+
+    // click pulse CSS
+    const style = document.createElement('style');
+    style.textContent = `@keyframes clickPulse{0%{transform:translate(-50%,-50%) scale(.5);opacity:1}100%{transform:translate(-50%,-50%) scale(2);opacity:0}}`;
+    document.head.appendChild(style);
+
+    // textarea auto-resize
+    document.addEventListener('input', function(e){
+      if (e.target && e.target.tagName === 'TEXTAREA'){ e.target.style.height = 'auto'; e.target.style.height = e.target.scrollHeight + 'px'; }
+    });
+
+    // particle effect (keeps original behavior)
+    function addParticleEffect(){
+      const container = document.querySelector('.enrollment-container');
+      if (!container) return;
+      for (let i=0;i<5;i++){
+        setTimeout(()=>{
+          const p = document.createElement('div');
+          p.style.position = 'absolute';
+          p.style.width = '4px';
+          p.style.height = '4px';
+          p.style.background = 'var(--accent-blue)';
+          p.style.borderRadius = '50%';
+          p.style.opacity = '0.3';
+          p.style.left = Math.random()*100 + '%';
+          p.style.top = Math.random()*100 + '%';
+          p.style.animation = 'float 4s ease-in-out infinite';
+          p.style.pointerEvents = 'none';
+          container.appendChild(p);
+          setTimeout(()=>{ if (p.parentNode) p.parentNode.removeChild(p); }, 4000);
+        }, i*800);
+      }
+    }
+
+    const floatStyle = document.createElement('style');
+    floatStyle.textContent = `@keyframes float{0%,100%{transform:translateY(0px) rotate(0deg)}33%{transform:translateY(-10px) rotate(1deg)}66%{transform:translateY(5px) rotate(-1deg)}}`;
+    document.head.appendChild(floatStyle);
+
+    const originalShowStep = showStep;
+    showStep = function(step){ originalShowStep(step); addParticleEffect(); };
+
+  </script>
+</body>
+</html>

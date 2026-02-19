@@ -1,0 +1,117 @@
+<!-- User Security Settings -->
+<div style="margin:40px auto;max-width:420px;box-shadow:0 0 12px #eee;padding:28px;border-radius:16px;">
+    <h2>User Security Settings</h2>
+    <label style="display:flex;align-items:center;gap:16px;font-size:18px;">
+      <input type="checkbox" id="biometricToggle" />
+      Enable Behavioral Biometric Authentication
+    </label>
+    <div id="statusText" style="margin-top:18px;color:#667eea;font-weight:600;"></div>
+  
+    <!-- Enrollment Button -->
+    <button id="enrollmentButton" style="margin-top:20px;padding:10px 16px;border:none;border-radius:8px;background:#667eea;color:white;cursor:pointer;">
+      Run Biometric Enrollment
+    </button>
+  </div>
+  
+  <script>
+    // Global flag
+    let biometricAuthEnabled = false;
+  
+    const biometricToggle = document.getElementById('biometricToggle');
+    const statusText = document.getElementById('statusText');
+    const enrollmentBtn = document.getElementById('enrollmentButton');
+  
+    // ✅ Load saved preference
+    biometricAuthEnabled = localStorage.getItem("biometricEnabled") === "true";
+    biometricToggle.checked = biometricAuthEnabled;
+    updateStatusText();
+  
+    // ✅ Toggle event
+    biometricToggle.addEventListener('change', function() {
+      biometricAuthEnabled = biometricToggle.checked;
+      localStorage.setItem("biometricEnabled", biometricAuthEnabled);
+      updateStatusText();
+    });
+  
+    // ✅ Status updater
+    function updateStatusText() {
+      statusText.textContent = biometricAuthEnabled
+        ? "Behavioral biometric authentication is ENABLED for this session."
+        : "Behavioral biometric authentication is DISABLED until you reactivate.";
+    }
+  
+    // ---------------------------
+    // 🔐 WebAuthn Enrollment (Registration)
+    // ---------------------------
+    async function runWebAuthnEnrollment() {
+      if (!biometricAuthEnabled) {
+        alert("Biometric authentication is disabled!");
+        return;
+      }
+  
+      try {
+        // Create PublicKeyCredential for registration
+        const publicKey = {
+          challenge: new Uint8Array(32), // should come from server
+          rp: { name: "My App" },
+          user: {
+            id: new Uint8Array(16), // unique user id from server
+            name: "user@example.com",
+            displayName: "User Example"
+          },
+          pubKeyCredParams: [{ type: "public-key", alg: -7 }], // ES256
+          authenticatorSelection: {
+            authenticatorAttachment: "platform", // Use built-in device (TouchID, Windows Hello, etc.)
+            userVerification: "required"
+          },
+          timeout: 60000,
+          attestation: "direct"
+        };
+  
+        const credential = await navigator.credentials.create({ publicKey });
+        console.log("WebAuthn Enrollment successful:", credential);
+  
+        alert("Biometric enrollment successful!");
+        // Normally send `credential` to your server to store public key
+      } catch (err) {
+        console.error("WebAuthn enrollment failed:", err);
+        alert("Biometric enrollment failed: " + err.message);
+      }
+    }
+  
+    // ---------------------------
+    // 🔐 WebAuthn Authentication (Verification)
+    // ---------------------------
+    async function runWebAuthnVerification() {
+      if (!biometricAuthEnabled) {
+        alert("Biometric authentication is disabled!");
+        return;
+      }
+  
+      try {
+        const publicKey = {
+          challenge: new Uint8Array(20), // should come from server
+          timeout: 60000,
+          userVerification: "required"
+        };
+  
+        const assertion = await navigator.credentials.get({ publicKey });
+        console.log("WebAuthn Verification successful:", assertion);
+  
+        alert("Biometric verification successful!");
+        // Normally send `assertion` to your server to verify signature
+      } catch (err) {
+        console.error("WebAuthn verification failed:", err);
+        alert("Biometric verification failed: " + err.message);
+      }
+    }
+  
+    // ✅ Attach button
+    if (enrollmentBtn) {
+      enrollmentBtn.onclick = async function() {
+        await runWebAuthnEnrollment();
+        await runWebAuthnVerification();
+      };
+    }
+  </script>
+  

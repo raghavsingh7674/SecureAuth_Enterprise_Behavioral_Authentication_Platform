@@ -1,0 +1,1348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureAuth - Behavioral Authentication System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --danger-gradient: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            --success-gradient: linear-gradient(135deg, #00b894 0%, #00a085 100%);
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --text-primary: #2d3748;
+            --text-secondary: #4a5568;
+            --surface: #ffffff;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --success: #27ae60;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--primary-gradient);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                       radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .main-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            width: 320px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--glass-border);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+        
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--primary-gradient);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 20px;
+        }
+        
+        .logo-text h1 {
+            color: white;
+            font-size: 20px;
+            font-weight: 700;
+        }
+        
+        .logo-text p {
+            color: rgba(255,255,255,0.7);
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .nav-menu {
+            list-style: none;
+        }
+        
+        .nav-item {
+            margin-bottom: 8px;
+        }
+        
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+        
+        .status-panel {
+            margin-top: auto;
+            padding: 20px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+            animation: pulse 2s infinite;
+        }
+        
+        .status-dot.warning {
+            background: var(--warning);
+        }
+        
+        .status-dot.danger {
+            background: var(--danger);
+        }
+        
+        .status-text {
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+        }
+        
+        .page {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .page-header {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(20px);
+            padding: 32px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+        
+        .page-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+        
+        .page-subtitle {
+            color: var(--text-secondary);
+            font-size: 16px;
+            font-weight: 500;
+        }
+        
+        .card {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .metric-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(248,250,252,0.9));
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary-gradient);
+        }
+        
+        .metric-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        
+        .metric-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+        
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-danger {
+            background: var(--danger-gradient);
+            color: white;
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+        }
+        
+        .btn-success {
+            background: var(--success-gradient);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 184, 148, 0.3);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+        
+        .form-input, .form-select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: rgba(255,255,255,0.8);
+        }
+        
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .alert {
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 500;
+            border-left: 4px solid;
+        }
+        
+        .alert-info {
+            background: rgba(52, 152, 219, 0.1);
+            color: #2980b9;
+            border-left-color: #3498db;
+        }
+        
+        .alert-warning {
+            background: rgba(243, 156, 18, 0.1);
+            color: #d68910;
+            border-left-color: #f39c12;
+        }
+        
+        .alert-danger {
+            background: rgba(231, 76, 60, 0.1);
+            color: #c0392b;
+            border-left-color: #e74c3c;
+        }
+        
+        .alert-success {
+            background: rgba(39, 174, 96, 0.1);
+            color: #27ae60;
+            border-left-color: #2ecc71;
+        }
+        
+        .log-entry {
+            padding: 12px;
+            border-left: 4px solid #e2e8f0;
+            margin-bottom: 8px;
+            background: rgba(248, 250, 252, 0.5);
+            border-radius: 4px;
+            font-family: 'SF Mono', monospace;
+            font-size: 13px;
+        }
+        
+        .log-entry.warning {
+            border-left-color: var(--warning);
+            background: rgba(243, 156, 18, 0.05);
+        }
+        
+        .log-entry.danger {
+            border-left-color: var(--danger);
+            background: rgba(231, 76, 60, 0.05);
+        }
+        
+        .log-timestamp {
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 12px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--primary-gradient);
+            transition: width 0.3s ease;
+            border-radius: 4px;
+        }
+        
+        .monitoring-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.95);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            backdrop-filter: blur(10px);
+        }
+        
+        .auth-challenge {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            text-align: center;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .challenge-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--danger-gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            font-size: 32px;
+            color: white;
+        }
+        
+        .challenge-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+        
+        .challenge-message {
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+        
+        .countdown {
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--danger);
+            margin: 20px 0;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+            }
+            
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <div class="logo-icon">SA</div>
+                <div class="logo-text">
+                    <h1>SecureAuth</h1>
+                    <p>Behavioral Authentication</p>
+                </div>
+            </div>
+            
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#" class="nav-link active" onclick="showPage('dashboard')">
+                        <span>📊</span> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" onclick="showPage('enrollment')">
+                        <span>👤</span> User Enrollment
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" onclick="showPage('monitoring')">
+                        <span>🔍</span> Live Monitoring
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" onclick="showPage('settings')">
+                        <span>⚙️</span> Security Settings
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" onclick="showPage('logs')">
+                        <span>📝</span> Activity Logs
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" onclick="showPage('reports')">
+                        <span>📈</span> Analytics
+                    </a>
+                </li>
+            </ul>
+            
+            <div class="status-panel">
+                <div class="status-indicator">
+                    <div class="status-dot" id="statusDot"></div>
+                    <span class="status-text" id="statusText">System Active</span>
+                </div>
+                <div style="font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 8px;">
+                    Monitoring: <span id="monitoringStatus">Enabled</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Dashboard Page -->
+            <div class="page active" id="dashboard">
+                <div class="page-header">
+                    <h1 class="page-title">Security Dashboard</h1>
+                    <p class="page-subtitle">Real-time behavioral authentication monitoring and system status</p>
+                </div>
+                
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value" id="authSuccessRate">98.7%</div>
+                        <div class="metric-label">Authentication Success Rate</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="activeUsers">1</div>
+                        <div class="metric-label">Active Users</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="threatLevel">Low</div>
+                        <div class="metric-label">Current Threat Level</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="systemUptime">24h</div>
+                        <div class="metric-label">System Uptime</div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3 style="margin-bottom: 16px; color: var(--text-primary);">Current Session Metrics</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                        <div>
+                            <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">Keystroke Pattern Match</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="keystrokeMatch" style="width: 95%"></div>
+                            </div>
+                            <div style="font-size: 14px; font-weight: 600; color: var(--text-primary);">95% Match</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">Mouse Behavior Match</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="mouseMatch" style="width: 92%"></div>
+                            </div>
+                            <div style="font-size: 14px; font-weight: 600; color: var(--text-primary);">92% Match</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3 style="margin-bottom: 16px; color: var(--text-primary);">System Controls</h3>
+                    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                        <button class="btn btn-primary" onclick="startMonitoring()">
+                            <span>▶️</span> Start Monitoring
+                        </button>
+                        <button class="btn btn-danger" onclick="stopMonitoring()">
+                            <span>⏹️</span> Stop Monitoring
+                        </button>
+                        <button class="btn btn-success" onclick="testAuthentication()">
+                            <span>🧪</span> Test Authentication
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- User Enrollment Page -->
+            <div class="page" id="enrollment">
+                <div class="page-header">
+                    <h1 class="page-title">User Enrollment</h1>
+                    <p class="page-subtitle">Register new users and capture behavioral biometric profiles</p>
+                </div>
+                
+                <div class="card">
+                    <h3 style="margin-bottom: 20px; color: var(--text-primary);">Quick Enrollment</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                        <div class="form-group">
+                            <label class="form-label">User ID</label>
+                            <input type="text" class="form-input" id="enrollUserId" placeholder="Enter unique user identifier">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-input" id="enrollEmail" placeholder="user@company.com">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Typing Sample (for keystroke analysis)</label>
+                        <input type="text" class="form-input" id="typingSample" placeholder="Type a sample sentence naturally" onkeydown="captureKeystroke(event)" onkeyup="captureKeystroke(event)">
+                        <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
+                            Keystrokes captured: <span id="capturedKeystrokes">0</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="enrollUser()">
+                        <span>✅</span> Enroll User
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Live Monitoring Page -->
+            <div class="page" id="monitoring">
+                <div class="page-header">
+                    <h1 class="page-title">Live Monitoring</h1>
+                    <p class="page-subtitle">Real-time behavioral analysis and threat detection</p>
+                </div>
+                
+                <div class="card">
+                    <h3 style="margin-bottom: 16px; color: var(--text-primary);">Monitoring Controls</h3>
+                    <div class="alert" id="monitoringAlert" style="display: none;"></div>
+                    <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px;">
+                        <button class="btn btn-primary" onclick="enableContinuousMonitoring()">
+                            <span>👁️</span> Enable Continuous Monitoring
+                        </button>
+                        <button class="btn btn-danger" onclick="disableContinuousMonitoring()">
+                            <span>👁️‍🗨️</span> Disable Monitoring
+                        </button>
+                        <button class="btn btn-success" onclick="resetBaseline()">
+                            <span>🔄</span> Reset Baseline
+                        </button>
+                    </div>
+                    <div id="realTimeMetrics" style="display: none;">
+                        <h4 style="color: var(--text-primary); margin-bottom: 12px;">Real-time Analysis</h4>
+                        <div id="liveAnalysis" style="font-family: monospace; background: #f8f9fa; padding: 12px; border-radius: 8px; font-size: 13px; max-height: 200px; overflow-y: auto;">
+                            Monitoring disabled. Click "Enable Continuous Monitoring" to start.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Security Settings Page -->
+            <div class="page" id="settings">
+                <div class="page-header">
+                    <h1 class="page-title">Security Settings</h1>
+                    <p class="page-subtitle">Configure authentication thresholds and security policies</p>
+                </div>
+                
+                <div class="card">
+                    <h3 style="margin-bottom: 20px; color: var(--text-primary);">Authentication Thresholds</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                        <div class="form-group">
+                            <label class="form-label">Keystroke Sensitivity (%)</label>
+                            <input type="range" id="keystrokeThreshold" min="70" max="99" value="85" oninput="updateThreshold('keystroke', this.value)">
+                            <div style="font-size: 12px; color: var(--text-secondary);">Current: <span id="keystrokeValue">85%</span></div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Mouse Behavior Sensitivity (%)</label>
+                            <input type="range" id="mouseThreshold" min="70" max="99" value="80" oninput="updateThreshold('mouse', this.value)">
+                            <div style="font-size: 12px; color: var(--text-secondary);">Current: <span id="mouseValue">80%</span></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Security Action</label>
+                        <select class="form-select" id="securityAction">
+                            <option value="warn">Show Warning Dialog</option>
+                            <option value="lock">Lock Screen</option>
+                            <option value="logout">Force Logout</option>
+                            <option value="minimize">Minimize Application</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" onclick="saveSettings()">
+                        <span>💾</span> Save Settings
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Activity Logs Page -->
+            <div class="page" id="logs">
+                <div class="page-header">
+                    <h1 class="page-title">Activity Logs</h1>
+                    <p class="page-subtitle">Detailed authentication and security event history</p>
+                </div>
+                
+                <div class="card">
+                    <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 20px;">
+                        <h3 style="color: var(--text-primary);">Recent Activity</h3>
+                        <button class="btn btn-primary" onclick="exportLogs()" style="margin-left: auto;">
+                            <span>📥</span> Export Logs
+                        </button>
+                    </div>
+                    <div id="activityLogs">
+                        <div class="log-entry">
+                            <span class="log-timestamp">[2024-01-15 14:30:25]</span> System initialized - Behavioral authentication active
+                        </div>
+                        <div class="log-entry">
+                            <span class="log-timestamp">[2024-01-15 14:30:30]</span> User baseline established - Keystroke pattern recorded
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Analytics Page -->
+            <div class="page" id="reports">
+                <div class="page-header">
+                    <h1 class="page-title">Security Analytics</h1>
+                    <p class="page-subtitle">Comprehensive reports and behavioral analysis insights</p>
+                </div>
+                
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value">156</div>
+                        <div class="metric-label">Total Authentications</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">3</div>
+                        <div class="metric-label">Security Alerts</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">0.2%</div>
+                        <div class="metric-label">False Positive Rate</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">99.8%</div>
+                        <div class="metric-label">System Reliability</div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3 style="margin-bottom: 16px; color: var(--text-primary);">Weekly Performance Summary</h3>
+                    <div style="color: var(--text-secondary); line-height: 1.6;">
+                        <p><strong>Authentication Accuracy:</strong> Your behavioral patterns show consistent recognition with 96.8% average accuracy.</p>
+                        <p><strong>Threat Detection:</strong> 3 potential anomalies detected and successfully handled this week.</p>
+                        <p><strong>System Performance:</strong> Zero false lockouts, maintaining optimal user experience.</p>
+                        <p><strong>Recommendation:</strong> Current sensitivity settings are optimal for your usage patterns.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Authentication Challenge Modal -->
+    <div class="monitoring-overlay" id="challengeModal">
+        <div class="auth-challenge">
+            <div class="challenge-icon">🔒</div>
+            <h2 class="challenge-title">Authentication Required</h2>
+            <p class="challenge-message">Unusual behavioral patterns detected. Please verify your identity to continue.</p>
+            <div class="countdown" id="challengeCountdown">30</div>
+            <div style="margin-top: 20px;">
+                <input type="password" placeholder="Enter your password" id="challengePassword" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 16px;">
+                <div style="display: flex; gap: 12px;">
+                    <button class="btn btn-primary" onclick="verifyChallengeAuth()" style="flex: 1;">Verify Identity</button>
+                    <button class="btn btn-danger" onclick="handleSecurityAction()" style="flex: 1;">Security Action</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global System State
+        let systemState = {
+            isMonitoring: false,
+            isEnrolled: false,
+            userProfile: null,
+            settings: {
+                keystrokeThreshold: 85,
+                mouseThreshold: 80,
+                securityAction: 'warn'
+            },
+            currentSession: {
+                startTime: Date.now(),
+                keystrokeData: [],
+                mouseData: [],
+                authAttempts: 0,
+                lastActivity: Date.now()
+            },
+            baseline: {
+                keystroke: {
+                    avgDwellTime: 0,
+                    avgFlightTime: 0,
+                    typingSpeed: 0,
+                    patterns: []
+                },
+                mouse: {
+                    avgVelocity: 0,
+                    clickPatterns: [],
+                    movementStyle: 'baseline'
+                }
+            },
+            securityLogs: []
+        };
+
+        // Behavioral Analysis Engine
+        class BehavioralAnalyzer {
+            constructor() {
+                this.keystrokeBuffer = [];
+                this.mouseBuffer = [];
+                this.analysisInterval = null;
+            }
+
+            startAnalysis() {
+                if (this.analysisInterval) return;
+                
+                this.analysisInterval = setInterval(() => {
+                    this.analyzeCurrentBehavior();
+                }, 2000); // Analyze every 2 seconds
+                
+                this.logEvent('info', 'Behavioral analysis engine started');
+            }
+
+            stopAnalysis() {
+                if (this.analysisInterval) {
+                    clearInterval(this.analysisInterval);
+                    this.analysisInterval = null;
+                }
+                this.logEvent('info', 'Behavioral analysis engine stopped');
+            }
+
+            captureKeystroke(event) {
+                const timestamp = Date.now();
+                const keystroke = {
+                    key: event.key,
+                    type: event.type,
+                    timestamp: timestamp,
+                    code: event.code
+                };
+
+                this.keystrokeBuffer.push(keystroke);
+                systemState.currentSession.keystrokeData.push(keystroke);
+
+                // Keep buffer size manageable
+                if (this.keystrokeBuffer.length > 100) {
+                    this.keystrokeBuffer = this.keystrokeBuffer.slice(-50);
+                }
+
+                this.updateLiveMetrics();
+            }
+
+            captureMouseMovement(event) {
+                const timestamp = Date.now();
+                const mouseData = {
+                    x: event.clientX,
+                    y: event.clientY,
+                    timestamp: timestamp,
+                    type: 'move'
+                };
+
+                this.mouseBuffer.push(mouseData);
+                systemState.currentSession.mouseData.push(mouseData);
+
+                if (this.mouseBuffer.length > 50) {
+                    this.mouseBuffer = this.mouseBuffer.slice(-25);
+                }
+            }
+
+            analyzeCurrentBehavior() {
+                if (!systemState.isMonitoring || !systemState.isEnrolled) return;
+
+                const keystrokeMatch = this.analyzeKeystrokePattern();
+                const mouseMatch = this.analyzeMousePattern();
+                const overallMatch = (keystrokeMatch + mouseMatch) / 2;
+
+                this.updateDashboardMetrics(keystrokeMatch, mouseMatch);
+                
+                // Check for anomalies
+                const keystrokeAnomaly = keystrokeMatch < systemState.settings.keystrokeThreshold;
+                const mouseAnomaly = mouseMatch < systemState.settings.mouseThreshold;
+
+                if (keystrokeAnomaly || mouseAnomaly) {
+                    this.handleAnomaly({
+                        keystrokeMatch,
+                        mouseMatch,
+                        overallMatch,
+                        type: keystrokeAnomaly && mouseAnomaly ? 'critical' : 'warning'
+                    });
+                }
+
+                systemState.currentSession.lastActivity = Date.now();
+            }
+
+            analyzeKeystrokePattern() {
+                if (this.keystrokeBuffer.length < 10 || !systemState.baseline.keystroke.patterns.length) {
+                    return 95; // Default high match if no baseline
+                }
+
+                // Calculate current typing metrics
+                const recent = this.keystrokeBuffer.slice(-20);
+                let dwellTimes = [];
+                let flightTimes = [];
+
+                for (let i = 0; i < recent.length - 1; i++) {
+                    if (recent[i].type === 'keydown' && recent[i + 1].type === 'keyup' && 
+                        recent[i].key === recent[i + 1].key) {
+                        dwellTimes.push(recent[i + 1].timestamp - recent[i].timestamp);
+                    }
+                }
+
+                const avgDwell = dwellTimes.length ? dwellTimes.reduce((a, b) => a + b) / dwellTimes.length : 0;
+                const baselineDwell = systemState.baseline.keystroke.avgDwellTime;
+
+                if (!baselineDwell) return 95;
+
+                // Calculate similarity (simplified algorithm)
+                const dwellSimilarity = Math.max(0, 100 - Math.abs(avgDwell - baselineDwell) * 2);
+                return Math.min(100, Math.max(60, dwellSimilarity));
+            }
+
+            analyzeMousePattern() {
+                if (this.mouseBuffer.length < 5) return 92;
+
+                // Calculate current mouse velocity
+                let totalVelocity = 0;
+                let velocityCount = 0;
+
+                for (let i = 1; i < this.mouseBuffer.length; i++) {
+                    const prev = this.mouseBuffer[i - 1];
+                    const curr = this.mouseBuffer[i];
+                    const distance = Math.sqrt(
+                        Math.pow(curr.x - prev.x, 2) + Math.pow(curr.y - prev.y, 2)
+                    );
+                    const timeDiff = curr.timestamp - prev.timestamp;
+                    
+                    if (timeDiff > 0) {
+                        totalVelocity += (distance / timeDiff) * 1000;
+                        velocityCount++;
+                    }
+                }
+
+                const avgVelocity = velocityCount ? totalVelocity / velocityCount : 0;
+                const baselineVelocity = systemState.baseline.mouse.avgVelocity || avgVelocity;
+
+                const velocitySimilarity = Math.max(0, 100 - Math.abs(avgVelocity - baselineVelocity) / 10);
+                return Math.min(100, Math.max(70, velocitySimilarity));
+            }
+
+            handleAnomaly(anomalyData) {
+                const message = `Behavioral anomaly detected - Keystroke: ${anomalyData.keystrokeMatch.toFixed(1)}%, Mouse: ${anomalyData.mouseMatch.toFixed(1)}%`;
+                
+                this.logEvent('warning', message);
+                
+                if (anomalyData.type === 'critical' || anomalyData.overallMatch < 75) {
+                    this.triggerSecurityChallenge(anomalyData);
+                } else {
+                    this.showWarningAlert(message);
+                }
+            }
+
+            triggerSecurityChallenge(anomalyData) {
+                this.logEvent('danger', `Security challenge triggered - Overall match: ${anomalyData.overallMatch.toFixed(1)}%`);
+                
+                // Show challenge modal
+                const modal = document.getElementById('challengeModal');
+                modal.style.display = 'flex';
+                
+                // Start countdown
+                let countdown = 30;
+                const countdownEl = document.getElementById('challengeCountdown');
+                
+                const countdownInterval = setInterval(() => {
+                    countdown--;
+                    countdownEl.textContent = countdown;
+                    
+                    if (countdown <= 0) {
+                        clearInterval(countdownInterval);
+                        this.executeSecurityAction();
+                    }
+                }, 1000);
+                
+                // Store interval for cleanup
+                window.currentChallenge = { interval: countdownInterval };
+            }
+
+            executeSecurityAction() {
+                const action = systemState.settings.securityAction;
+                const modal = document.getElementById('challengeModal');
+                modal.style.display = 'none';
+                
+                this.logEvent('danger', `Security action executed: ${action}`);
+                
+                switch (action) {
+                    case 'warn':
+                        alert('🚨 SECURITY ALERT\n\nUnauthorized behavior detected. System access may be restricted.');
+                        break;
+                    case 'lock':
+                        this.lockScreen();
+                        break;
+                    case 'logout':
+                        this.forceLogout();
+                        break;
+                    case 'minimize':
+                        this.minimizeApplication();
+                        break;
+                }
+                
+                // Update threat level
+                document.getElementById('threatLevel').textContent = 'High';
+                updateSystemStatus('danger', 'Security Alert Active');
+            }
+
+            lockScreen() {
+                document.body.style.filter = 'blur(10px)';
+                document.body.style.pointerEvents = 'none';
+                
+                const lockOverlay = document.createElement('div');
+                lockOverlay.innerHTML = `
+                    <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); 
+                                display: flex; align-items: center; justify-content: center; z-index: 10000; color: white; text-align: center;">
+                        <div>
+                            <div style="font-size: 48px; margin-bottom: 20px;">🔒</div>
+                            <h2>System Locked</h2>
+                            <p>Behavioral authentication failed. Contact administrator.</p>
+                            <button onclick="unlockSystem()" style="margin-top: 20px; padding: 10px 20px; border: none; 
+                                   border-radius: 5px; background: #3498db; color: white; cursor: pointer;">
+                                Request Unlock
+                            </button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(lockOverlay);
+            }
+
+            forceLogout() {
+                alert('🚪 SYSTEM LOGOUT\n\nForced logout due to security violation.');
+                // In a real system, this would clear session and redirect
+                window.location.reload();
+            }
+
+            minimizeApplication() {
+                document.body.style.display = 'none';
+                alert('🔽 APPLICATION MINIMIZED\n\nSecurity protocol activated. Application minimized.');
+                setTimeout(() => {
+                    document.body.style.display = 'block';
+                }, 10000);
+            }
+
+            showWarningAlert(message) {
+                const alertEl = document.getElementById('monitoringAlert');
+                if (alertEl) {
+                    alertEl.className = 'alert alert-warning';
+                    alertEl.textContent = `⚠️ ${message}`;
+                    alertEl.style.display = 'block';
+                    
+                    setTimeout(() => {
+                        alertEl.style.display = 'none';
+                    }, 5000);
+                }
+            }
+
+            updateLiveMetrics() {
+                const liveAnalysis = document.getElementById('liveAnalysis');
+                if (!liveAnalysis || !systemState.isMonitoring) return;
+
+                const timestamp = new Date().toLocaleTimeString();
+                const keystrokeCount = this.keystrokeBuffer.length;
+                const mouseCount = this.mouseBuffer.length;
+
+                liveAnalysis.innerHTML += `
+                    <div>[${timestamp}] Keystroke buffer: ${keystrokeCount}, Mouse buffer: ${mouseCount}</div>
+                `;
+                
+                liveAnalysis.scrollTop = liveAnalysis.scrollHeight;
+            }
+
+            updateDashboardMetrics(keystrokeMatch, mouseMatch) {
+                const keystrokeEl = document.getElementById('keystrokeMatch');
+                const mouseEl = document.getElementById('mouseMatch');
+                
+                if (keystrokeEl) {
+                    keystrokeEl.style.width = keystrokeMatch + '%';
+                    keystrokeEl.parentElement.nextElementSibling.textContent = `${keystrokeMatch.toFixed(1)}% Match`;
+                }
+                
+                if (mouseEl) {
+                    mouseEl.style.width = mouseMatch + '%';
+                    mouseEl.parentElement.nextElementSibling.textContent = `${mouseMatch.toFixed(1)}% Match`;
+                }
+            }
+
+            logEvent(level, message) {
+                const timestamp = new Date().toLocaleString();
+                const logEntry = {
+                    timestamp,
+                    level,
+                    message
+                };
+                
+                systemState.securityLogs.unshift(logEntry);
+                
+                // Keep logs manageable
+                if (systemState.securityLogs.length > 1000) {
+                    systemState.securityLogs = systemState.securityLogs.slice(0, 500);
+                }
+                
+                this.updateLogDisplay();
+            }
+
+            updateLogDisplay() {
+                const logsContainer = document.getElementById('activityLogs');
+                if (!logsContainer) return;
+
+                const recentLogs = systemState.securityLogs.slice(0, 20);
+                logsContainer.innerHTML = recentLogs.map(log => `
+                    <div class="log-entry ${log.level}">
+                        <span class="log-timestamp">[${log.timestamp}]</span> ${log.message}
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Initialize the analyzer
+        const behavioralAnalyzer = new BehavioralAnalyzer();
+
+        // UI Functions
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            document.getElementById(pageId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function startMonitoring() {
+            if (!systemState.isEnrolled) {
+                alert('⚠️ Please enroll a user first before starting monitoring.');
+                return;
+            }
+
+            systemState.isMonitoring = true;
+            behavioralAnalyzer.startAnalysis();
+            
+            updateSystemStatus('success', 'Monitoring Active');
+            document.getElementById('monitoringStatus').textContent = 'Active';
+            
+            // Start global event listeners
+            document.addEventListener('keydown', (e) => behavioralAnalyzer.captureKeystroke(e));
+            document.addEventListener('keyup', (e) => behavioralAnalyzer.captureKeystroke(e));
+            document.addEventListener('mousemove', (e) => behavioralAnalyzer.captureMouseMovement(e));
+            
+            alert('✅ Continuous behavioral monitoring is now active. System will analyze your typing and mouse patterns in real-time.');
+        }
+
+        function stopMonitoring() {
+            systemState.isMonitoring = false;
+            behavioralAnalyzer.stopAnalysis();
+            
+            updateSystemStatus('warning', 'Monitoring Disabled');
+            document.getElementById('monitoringStatus').textContent = 'Disabled';
+            
+            alert('⏹️ Behavioral monitoring stopped.');
+        }
+
+        function testAuthentication() {
+            if (!systemState.isMonitoring) {
+                alert('⚠️ Please start monitoring first.');
+                return;
+            }
+            
+            // Simulate an anomaly for testing
+            behavioralAnalyzer.handleAnomaly({
+                keystrokeMatch: 65,
+                mouseMatch: 70,
+                overallMatch: 67.5,
+                type: 'critical'
+            });
+        }
+
+        function enrollUser() {
+            const userId = document.getElementById('enrollUserId').value;
+            const email = document.getElementById('enrollEmail').value;
+            const typingSample = document.getElementById('typingSample').value;
+
+            if (!userId || !email || !typingSample) {
+                alert('⚠️ Please fill in all fields and provide a typing sample.');
+                return;
+            }
+
+            if (typingSample.length < 20) {
+                alert('⚠️ Please provide a longer typing sample (minimum 20 characters).');
+                return;
+            }
+
+            // Create user profile and baseline
+            systemState.userProfile = { userId, email };
+            systemState.isEnrolled = true;
+            
+            // Establish baseline from typing sample
+            const keystrokeData = systemState.currentSession.keystrokeData.slice(-50);
+            if (keystrokeData.length > 0) {
+                systemState.baseline.keystroke = calculateKeystrokeBaseline(keystrokeData);
+            }
+
+            updateSystemStatus('success', 'User Enrolled');
+            document.getElementById('activeUsers').textContent = '1';
+            
+            behavioralAnalyzer.logEvent('info', `User enrolled: ${userId}`);
+            alert('✅ User enrolled successfully! You can now start behavioral monitoring.');
+        }
+
+        function calculateKeystrokeBaseline(keystrokeData) {
+            let dwellTimes = [];
+            
+            for (let i = 0; i < keystrokeData.length - 1; i++) {
+                if (keystrokeData[i].type === 'keydown' && keystrokeData[i + 1].type === 'keyup' && 
+                    keystrokeData[i].key === keystrokeData[i + 1].key) {
+                    dwellTimes.push(keystrokeData[i + 1].timestamp - keystrokeData[i].timestamp);
+                }
+            }
+            
+            const avgDwellTime = dwellTimes.length ? dwellTimes.reduce((a, b) => a + b) / dwellTimes.length : 120;
+            
+            return {
+                avgDwellTime,
+                avgFlightTime: 150, // Default baseline
+                typingSpeed: 45, // Default WPM
+                patterns: dwellTimes
+            };
+        }
+
+        function captureKeystroke(event) {
+            behavioralAnalyzer.captureKeystroke(event);
+            
+            // Update keystroke counter
+            const counter = document.getElementById('capturedKeystrokes');
+            if (counter) {
+                counter.textContent = systemState.currentSession.keystrokeData.length;
+            }
+        }
+
+        function enableContinuousMonitoring() {
+            document.getElementById('realTimeMetrics').style.display = 'block';
+            document.getElementById('liveAnalysis').innerHTML = 'Monitoring enabled. User behavior being analyzed...<br>';
+            startMonitoring();
+        }
+
+        function disableContinuousMonitoring() {
+            document.getElementById('realTimeMetrics').style.display = 'none';
+            stopMonitoring();
+        }
+
+        function resetBaseline() {
+            if (confirm('⚠️ This will reset your behavioral baseline. Continue?')) {
+                systemState.baseline = {
+                    keystroke: { avgDwellTime: 0, avgFlightTime: 0, typingSpeed: 0, patterns: [] },
+                    mouse: { avgVelocity: 0, clickPatterns: [], movementStyle: 'baseline' }
+                };
+                alert('🔄 Baseline reset. Please re-enroll to establish new patterns.');
+            }
+        }
+
+        function updateThreshold(type, value) {
+            systemState.settings[type + 'Threshold'] = parseInt(value);
+            document.getElementById(type + 'Value').textContent = value + '%';
+        }
+
+        function saveSettings() {
+            const action = document.getElementById('securityAction').value;
+            systemState.settings.securityAction = action;
+            
+            behavioralAnalyzer.logEvent('info', `Settings updated - Keystroke: ${systemState.settings.keystrokeThreshold}%, Mouse: ${systemState.settings.mouseThreshold}%, Action: ${action}`);
+            alert('💾 Settings saved successfully!');
+        }
+
+        function exportLogs() {
+            const logs = systemState.securityLogs.map(log => 
+                `${log.timestamp} [${log.level.toUpperCase()}] ${log.message}`
+            ).join('\n');
+            
+            const blob = new Blob([logs], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `secureauth_logs_${new Date().toISOString().split('T')[0]}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function verifyChallengeAuth() {
+            const password = document.getElementById('challengePassword').value;
+            
+            if (password === 'admin' || password === 'secure123') {
+                document.getElementById('challengeModal').style.display = 'none';
+                if (window.currentChallenge) {
+                    clearInterval(window.currentChallenge.interval);
+                }
+                
+                behavioralAnalyzer.logEvent('info', 'Authentication challenge passed');
+                updateSystemStatus('success', 'Authentication Verified');
+                alert('✅ Identity verified. Access restored.');
+            } else {
+                alert('❌ Invalid credentials. Try again.');
+                behavioralAnalyzer.logEvent('warning', 'Authentication challenge failed');
+            }
+        }
+
+        function handleSecurityAction() {
+            if (window.currentChallenge) {
+                clearInterval(window.currentChallenge.interval);
+            }
+            behavioralAnalyzer.executeSecurityAction();
+        }
+
+        function unlockSystem() {
+            const password = prompt('Enter administrator password:');
+            if (password === 'admin123') {
+                location.reload();
+            } else {
+                alert('❌ Invalid administrator password.');
+            }
+        }
+
+        function updateSystemStatus(type, message) {
+            const dot = document.getElementById('statusDot');
+            const text = document.getElementById('statusText');
+            
+            dot.className = `status-dot ${type}`;
+            text.textContent = message;
+        }
+
+        // Initialize system
+        document.addEventListener('DOMContentLoaded', function() {
+            updateSystemStatus('success', 'System Ready');
+            behavioralAnalyzer.logEvent('info', 'SecureAuth Behavioral Authentication System initialized');
+            
+            // Update uptime counter
+            setInterval(() => {
+                const uptime = Math.floor((Date.now() - systemState.currentSession.startTime) / 1000);
+                const hours = Math.floor(uptime / 3600);
+                const minutes = Math.floor((uptime % 3600) / 60);
+                document.getElementById('systemUptime').textContent = `${hours}h ${minutes}m`;
+            }, 60000);
+        });
+    </script>
+</body>
+</html>
